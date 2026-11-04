@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>秦始皇骑象图 · SVG 动画</title>
+<style>
+:root{ --sf:1; --ink:#332b22; --gold:#b8903f; }
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{
+  background:#d9cbb0;
+  color:var(--ink);
+  font-family:"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",system-ui,sans-serif;
+  display:flex;align-items:center;justify-content:center;
+  padding:clamp(10px,3vw,32px);
+}
+.frame{
+  position:relative;
+  width:min(1120px,100%);
+  aspect-ratio:16/9;
+  background:#f6ecd8;
+  border:1px solid #b6a27a;
+  box-shadow:0 20px 55px rgba(60,44,22,.24), inset 0 0 0 9px rgba(184,144,63,.10);
+  overflow:hidden;
+}
+svg{display:block;width:100%;height:100%}
+
+/* ---------- 题跋与钤印 ---------- */
+.caption{position:absolute;left:clamp(14px,3%,34px);bottom:clamp(12px,4%,30px);display:flex;align-items:center;gap:12px;pointer-events:none}
+.seal{
+  width:clamp(30px,4.2vw,46px);height:clamp(30px,4.2vw,46px);
+  background:#9b3327;color:#f8ead0;border:2px solid #7d281e;border-radius:4px;
+  display:grid;place-items:center;
+  font-family:"Songti SC","STSong","SimSun",serif;font-weight:700;
+  font-size:clamp(17px,2.5vw,27px);line-height:1;
+  transform:rotate(-4deg);box-shadow:1px 2px 0 rgba(80,30,20,.25);
+}
+.caption h1{
+  margin:0;font-family:"Songti SC","STSong","SimSun","Noto Serif CJK SC",serif;
+  font-size:clamp(16px,2.6vw,29px);font-weight:700;letter-spacing:.14em;
+}
+.caption p{margin:3px 0 0;font-size:clamp(9px,1.15vw,12px);letter-spacing:.3em;color:#8a785c}
+
+/* ---------- 控制条 ---------- */
+.tweaks{
+  position:absolute;right:clamp(12px,2.5%,26px);bottom:clamp(12px,4%,28px);
+  display:flex;align-items:center;gap:4px;
+  padding:5px;background:rgba(250,242,225,.86);
+  border:1px solid #c3ae83;border-radius:999px;
+  backdrop-filter:blur(4px);
+}
+.tweaks button{
+  min-height:36px;padding:0 13px;border:0;border-radius:999px;
+  background:transparent;color:#5c4c34;cursor:pointer;
+  font-size:13px;font-family:inherit;letter-spacing:.04em;
+  transition:background .18s,color .18s;
+}
+.tweaks button:hover{background:rgba(155,51,39,.10)}
+.tweaks button.on{background:#332b22;color:#f6ecd8}
+.tweaks button:focus-visible{outline:2px solid #9b3327;outline-offset:2px}
+.tweaks .sep{width:1px;height:20px;background:#c9b691;margin:0 3px}
+
+/* ---------- 动画 ---------- */
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes sway{0%,100%{transform:rotate(-.7deg)}50%{transform:rotate(.7deg)}}
+@keyframes stride{0%,100%{transform:rotate(-14deg)}50%{transform:rotate(14deg)}}
+@keyframes ear{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(9deg)}}
+@keyframes trunk{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(7deg)}}
+@keyframes tail{0%,100%{transform:rotate(-16deg)}50%{transform:rotate(20deg)}}
+@keyframes bead{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
+@keyframes flag{0%,100%{transform:skewY(-3deg) scaleX(.97)}50%{transform:skewY(3.5deg) scaleX(1.03)}}
+@keyframes drift{from{transform:translateX(0)}to{transform:translateX(-960px)}}
+@keyframes dust{0%{transform:translate(0,0);opacity:0}25%{opacity:.65}100%{transform:translate(-70px,-26px);opacity:0}}
+@keyframes halo{0%,100%{opacity:.32;transform:scale(1)}50%{opacity:.6;transform:scale(1.06)}}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+@keyframes bird{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes glow{0%,100%{opacity:.55}50%{opacity:.9}}
+
+#parade{animation:bob calc(.55s * var(--sf)) ease-in-out infinite}
+#elephant{transform-box:view-box;transform-origin:450px 320px;animation:sway calc(1.1s * var(--sf)) ease-in-out infinite}
+.leg{transform-box:view-box;animation:stride calc(1.1s * var(--sf)) ease-in-out infinite}
+.leg.b{animation-delay:calc(-.55s * var(--sf))}
+#ear{transform-box:view-box;transform-origin:590px 246px;animation:ear calc(1.1s * var(--sf)) ease-in-out infinite}
+#trunk{transform-box:view-box;transform-origin:678px 302px;animation:trunk calc(1.1s * var(--sf)) ease-in-out infinite}
+#tail{transform-box:view-box;transform-origin:300px 288px;animation:tail calc(.8s * var(--sf)) ease-in-out infinite}
+#beads{transform-box:view-box;transform-origin:414px 120px;animation:bead calc(.55s * var(--sf)) ease-in-out infinite}
+#flagcloth{transform-box:view-box;transform-origin:336px 100px;animation:flag calc(1.6s * var(--sf)) ease-in-out infinite}
+.drift-slow{animation:drift calc(46s * var(--sf)) linear infinite}
+.drift-fast{animation:drift calc(7s * var(--sf)) linear infinite}
+.dust{animation:dust calc(1.1s * var(--sf)) ease-out infinite}
+#halo{transform-box:view-box;transform-origin:790px 104px;animation:halo 5s ease-in-out infinite}
+#rays{transform-box:view-box;transform-origin:790px 104px;animation:spin calc(80s * var(--sf)) linear infinite}
+.bird{animation:bird calc(1.4s * var(--sf)) ease-in-out infinite}
+#sun{animation:glow 5s ease-in-out infinite}
+
+#stage.paused *,.reduced *{animation-play-state:paused!important}
+@media (prefers-reduced-motion:reduce){#stage *{animation-play-state:paused!important}}
+</style>
+</head>
+<body>
+<div class="frame" id="stage">
+<svg viewBox="0 0 960 540" role="img" aria-label="秦始皇骑着大象向右巡行的 SVG 动画">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fcf4e3"/><stop offset="1" stop-color="#efdfbc"/>
+    </linearGradient>
+    <linearGradient id="robe" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#30333c"/><stop offset="1" stop-color="#171920"/>
+    </linearGradient>
+    <linearGradient id="hide" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#adb0b3"/><stop offset="1" stop-color="#86898e"/>
+    </linearGradient>
+    <clipPath id="frameClip"><rect x="0" y="0" width="960" height="540"/></clipPath>
+
+    <!-- 云（静态图案，由外层平移形成连续漂移） -->
+    <g id="clouds" fill="#fffaf0" opacity=".82">
+      <g transform="translate(90 118)">
+        <path d="M0 22 C-6 8 8 -2 22 2 C26 -12 48 -16 58 -4 C72 -10 86 0 82 12 C96 12 100 28 88 32 L10 32 C-2 32 -4 26 0 22 Z"/>
+        <path d="M18 24 C12 34 30 40 38 30" fill="none" stroke="#e8d9b8" stroke-width="3" stroke-linecap="round"/>
+        <path d="M52 24 C46 35 66 41 74 29" fill="none" stroke="#e8d9b8" stroke-width="3" stroke-linecap="round"/>
+      </g>
+      <g transform="translate(430 76) scale(.72)">
+        <path d="M0 22 C-6 8 8 -2 22 2 C26 -12 48 -16 58 -4 C72 -10 86 0 82 12 C96 12 100 28 88 32 L10 32 C-2 32 -4 26 0 22 Z"/>
+        <path d="M18 24 C12 34 30 40 38 30" fill="none" stroke="#e8d9b8" stroke-width="3" stroke-linecap="round"/>
+      </g>
+      <g transform="translate(690 208) scale(.58)">
+        <path d="M0 22 C-6 8 8 -2 22 2 C26 -12 48 -16 58 -4 C72 -10 86 0 82 12 C96 12 100 28 88 32 L10 32 C-2 32 -4 26 0 22 Z"/>
+      </g>
+    </g>
+
+    <!-- 地面纹理（同样双份平移） -->
+    <g id="groundBits" fill="none" stroke="#9c7f55" stroke-linecap="round">
+      <g stroke-width="2.4" opacity=".65">
+        <path d="M40 448 l0 -11 M46 448 l5 -9 M34 448 l-5 -8"/>
+        <path d="M180 452 l0 -10 M186 452 l5 -8 M174 452 l-5 -7"/>
+        <path d="M300 446 l0 -12 M306 446 l6 -9 M294 446 l-6 -8"/>
+        <path d="M470 453 l0 -10 M476 453 l5 -8 M464 453 l-5 -7"/>
+        <path d="M620 447 l0 -12 M626 447 l6 -9 M614 447 l-6 -8"/>
+        <path d="M790 452 l0 -10 M796 452 l5 -8 M784 452 l-5 -7"/>
+        <path d="M900 446 l0 -11 M906 446 l5 -9 M894 446 l-5 -8"/>
+      </g>
+      <g fill="#a98a5f" stroke="none" opacity=".55">
+        <ellipse cx="120" cy="470" rx="11" ry="3"/><ellipse cx="255" cy="492" rx="8" ry="2.5"/>
+        <ellipse cx="410" cy="466" rx="13" ry="3"/><ellipse cx="560" cy="500" rx="9" ry="2.5"/>
+        <ellipse cx="710" cy="470" rx="12" ry="3"/><ellipse cx="860" cy="488" rx="9" ry="2.5"/>
+      </g>
+    </g>
+  </defs>
+
+  <g clip-path="url(#frameClip)">
+    <!-- 天空 -->
+    <rect x="0" y="0" width="960" height="540" fill="url(#sky)"/>
+    <g id="rays" stroke="#d9a94f" stroke-width="2.5" stroke-linecap="round" opacity=".55">
+      <path d="M790 40 v-14 M790 168 v14 M726 104 h-14 M854 104 h14 M745 59 l-10 -10 M835 149 l10 10 M835 59 l10 -10 M745 149 l-10 10"/>
+    </g>
+    <circle id="halo" cx="790" cy="104" r="60" fill="#d9613f" opacity=".35"/>
+    <circle id="sun" cx="790" cy="104" r="43" fill="#c14a31"/>
+    <circle cx="790" cy="104" r="43" fill="none" stroke="#e8b25a" stroke-width="2" opacity=".8"/>
+
+    <!-- 远山三层 -->
+    <path d="M0 342 L92 288 L152 314 L242 252 L322 308 L404 274 L474 328 L566 284 L662 334 L758 292 L852 332 L960 296 L960 440 L0 440 Z" fill="#d5cbb0"/>
+    <path d="M0 366 L84 326 L170 352 L268 306 L356 350 L446 318 L540 360 L640 320 L736 358 L836 322 L960 358 L960 440 L0 440 Z" fill="#bcb196"/>
+    <path d="M0 396 L120 366 L224 392 L340 358 L452 392 L570 362 L686 394 L800 364 L960 392 L960 440 L0 440 Z" fill="#a49c81"/>
+
+    <!-- 云层（两份无缝滚动） -->
+    <g class="drift-slow">
+      <use href="#clouds" x="0"/><use href="#clouds" x="960"/>
+    </g>
+
+    <!-- 飞鸟 -->
+    <g fill="none" stroke="#5d5344" stroke-width="2.2" stroke-linecap="round" opacity=".7">
+      <g class="bird" transform="translate(660 150)"><path d="M0 0 q7 -8 14 0 q7 -8 14 0"/></g>
+      <g class="bird" transform="translate(700 128)" style="animation-delay:-.5s"><path d="M0 0 q6 -7 12 0 q6 -7 12 0"/></g>
+    </g>
+
+    <!-- 地面 -->
+    <path d="M0 424 C160 418 300 430 470 424 C640 418 800 430 960 423 L960 540 L0 540 Z" fill="#c9ac7e"/>
+    <path d="M0 424 C160 418 300 430 470 424 C640 418 800 430 960 423" fill="none" stroke="#a1804f" stroke-width="3" opacity=".7"/>
+    <g class="drift-fast"><use href="#groundBits" x="0"/><use href="#groundBits" x="960"/></g>
+
+    <!-- ============ 主体：象 + 始皇 ============ -->
+    <g id="parade">
+      <g id="elephant">
+        <!-- 远侧两腿 -->
+        <g class="leg b" style="transform-origin:336px 366px">
+          <rect x="318" y="360" width="36" height="72" rx="11" fill="#7d8085"/>
+          <ellipse cx="336" cy="430" rx="23" ry="9" fill="#7d8085"/>
+          <path d="M321 428 h30" stroke="#5f6267" stroke-width="2"/>
+        </g>
+        <g class="leg" style="transform-origin:534px 366px">
+          <rect x="516" y="360" width="36" height="72" rx="11" fill="#7d8085"/>
+          <ellipse cx="534" cy="430" rx="23" ry="9" fill="#7d8085"/>
+          <path d="M519 428 h30" stroke="#5f6267" stroke-width="2"/>
+        </g>
+
+        <!-- 尾巴 -->
+        <g id="tail">
+          <path d="M300 288 C276 292 262 312 261 340" fill="none" stroke="#8b8e92" stroke-width="8" stroke-linecap="round"/>
+          <path d="M261 338 l-7 16 M261 338 l3 17 M261 338 l10 14" stroke="#5e6165" stroke-width="4" stroke-linecap="round"/>
+        </g>
+
+        <!-- 躯干 -->
+        <path d="M298 305 C296 258 335 236 395 236 L505 236 C560 236 592 258 596 300 L596 340 C592 375 560 390 510 390 L370 390 C325 390 300 368 298 335 Z" fill="url(#hide)"/>
+        <path d="M300 320 C320 300 360 292 420 292 C490 292 550 300 594 322" fill="none" stroke="#c3c5c7" stroke-width="6" opacity=".35" stroke-linecap="round"/>
+        <path d="M312 372 C360 386 520 388 580 370" fill="none" stroke="#6f7277" stroke-width="4" opacity=".35"/>
+
+        <!-- 头 -->
+        <path d="M584 262 C584 234 610 217 642 219 C679 221 699 250 697 288 C695 323 672 349 640 351 C609 353 587 330 584 300 Z" fill="url(#hide)"/>
+        <path d="M596 246 C612 228 640 224 660 234" fill="none" stroke="#c6c8ca" stroke-width="5" opacity=".4" stroke-linecap="round"/>
+
+        <!-- 耳朵（扇动） -->
+        <g id="ear">
+          <path d="M592 240 C560 220 526 231 520 262 C514 297 535 331 566 337 C589 341 601 320 600 290 C600 266 598 250 592 240 Z" fill="#8e9195"/>
+          <path d="M584 250 C558 238 536 248 532 270 C528 296 544 320 566 325 C582 328 590 312 590 288 C590 270 588 258 584 250 Z" fill="#b9a6a2" opacity=".85"/>
+        </g>
+
+        <!-- 眼 -->
+        <circle cx="662" cy="272" r="7" fill="#3a3733"/>
+        <circle cx="660" cy="269" r="2.4" fill="#fff" opacity=".9"/>
+        <path d="M650 253 C658 248 668 249 674 254" fill="none" stroke="#5c5e62" stroke-width="3" stroke-linecap="round"/>
+
+        <!-- 象牙 -->
+        <path d="M654 318 C676 326 693 318 701 300" fill="none" stroke="#f6efdc" stroke-width="10" stroke-linecap="round"/>
+        <path d="M648 330 C668 338 685 330 691 314" fill="none" stroke="#e8dfc8" stroke-width="8" stroke-linecap="round"/>
+
+        <!-- 鼻（摆动） -->
+        <g id="trunk">
+          <path d="M676 300 C700 310 705 340 701 372 C698 403 708 421 690 429 C677 435 665 427 665 416" fill="none" stroke="#96999d" stroke-width="30" stroke-linecap="round"/>
+          <g stroke="#71757a" stroke-width="3" opacity=".7" stroke-linecap="round">
+            <path d="M688 330 q10 3 14 0"/><path d="M690 352 q10 3 13 0"/>
+            <path d="M690 374 q10 3 12 0"/><path d="M691 396 q10 3 11 0"/>
+          </g>
+          <circle cx="670" cy="418" r="4" fill="#5e6166"/>
+        </g>
+
+        <!-- 近侧两腿 -->
+        <g class="leg" style="transform-origin:378px 366px">
+          <rect x="360" y="360" width="36" height="74" rx="11" fill="#a0a3a7"/>
+          <ellipse cx="378" cy="432" rx="24" ry="9" fill="#a0a3a7"/>
+          <path d="M363 430 h30" stroke="#717479" stroke-width="2"/>
+          <path d="M366 378 h24" stroke="#8b8e93" stroke-width="3" opacity=".6"/>
+        </g>
+        <g class="leg b" style="transform-origin:570px 366px">
+          <rect x="552" y="360" width="36" height="74" rx="11" fill="#a0a3a7"/>
+          <ellipse cx="570" cy="432" rx="24" ry="9" fill="#a0a3a7"/>
+          <path d="M555 430 h30" stroke="#717479" stroke-width="2"/>
+          <path d="M558 378 h24" stroke="#8b8e93" stroke-width="3" opacity=".6"/>
+        </g>
+
+        <!-- 蹄后扬尘 -->
+        <g fill="#b99a6d">
+          <circle class="dust" cx="352" cy="434" r="7" style="animation-delay:0s"/>
+          <circle class="dust" cx="330" cy="438" r="5" style="animation-delay:calc(-.35s * var(--sf))"/>
+          <circle class="dust" cx="548" cy="436" r="6" style="animation-delay:calc(-.55s * var(--sf))"/>
+          <circle class="dust" cx="590" cy="438" r="4" style="animation-delay:calc(-.8s * var(--sf))"/>
+        </g>
+      </g>
+
+      <!-- 旌旗（在鞍后） -->
+      <g id="flag">
+        <rect x="333" y="70" width="6" height="172" rx="3" fill="#2b2a2e"/>
+        <path d="M336 62 l0 -12" stroke="#b8903f" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="336" cy="47" r="6" fill="#b8903f"/>
+        <g id="flagcloth">
+          <path d="M333 80 C310 74 286 90 258 80 C262 100 254 116 258 134 C286 124 310 140 333 132 Z" fill="#22252c"/>
+          <path d="M333 80 C310 74 286 90 258 80" fill="none" stroke="#b8903f" stroke-width="3"/>
+          <path d="M258 134 C286 124 310 140 333 132" fill="none" stroke="#b8903f" stroke-width="3"/>
+          <text x="295" y="118" text-anchor="middle" fill="#d9b25c" font-size="30"
+                font-family="'Songti SC','STSong','SimSun',serif" font-weight="700">秦</text>
+        </g>
+      </g>
+
+      <!-- 鞍毯 -->
+      <g>
+        <path d="M344 236 L516 236 L524 268 L516 282 L344 282 L336 268 Z" fill="#8f3025"/>
+        <path d="M344 236 L516 236 L520 250 L340 250 Z" fill="#a63b2c"/>
+        <path d="M340 250 L520 250" stroke="#d0a44e" stroke-width="3"/>
+        <path d="M344 278 L516 278" stroke="#d0a44e" stroke-width="3"/>
+        <path d="M344 282 l8 12 8 -12 8 12 8 -12 8 12 8 -12 8 12 8 -12 8 12 8 -12 8 12 8 -12 8 12 8 -12 8 12 8 -12 8 12 8 -12 8 12 8 -12" fill="none" stroke="#d0a44e" stroke-width="2.5"/>
+        <g fill="none" stroke="#d0a44e" stroke-width="2" opacity=".8">
+          <path d="M370 262 l8 -8 8 8 -8 8 Z"/><path d="M420 262 l8 -8 8 8 -8 8 Z"/><path d="M470 262 l8 -8 8 8 -8 8 Z"/>
+        </g>
+      </g>
+
+      <!-- 秦始皇 -->
+      <g id="rider">
+        <!-- 袍身 -->
+        <path d="M398 168 C378 170 368 188 368 214 L366 236 L456 236 L454 212 C452 186 440 170 424 168 Z" fill="url(#robe)"/>
+        <path d="M398 168 C390 182 388 200 388 236 L366 236 L368 214 C368 188 378 170 398 168 Z" fill="#3b3e47" opacity=".55"/>
+        <!-- 衣缘与领 -->
+        <path d="M398 168 L414 190 L424 168" fill="none" stroke="#9b3327" stroke-width="7" stroke-linejoin="round"/>
+        <path d="M414 190 L414 236" stroke="#b8903f" stroke-width="3"/>
+        <path d="M370 228 L454 228" stroke="#b8903f" stroke-width="3"/>
+        <!-- 宽袖与手（执卷） -->
+        <path d="M446 186 C462 188 474 202 474 216 C474 226 464 230 452 228 L440 214 Z" fill="#2b2e36"/>
+        <path d="M446 186 C462 188 474 202 474 216" fill="none" stroke="#b8903f" stroke-width="2.5"/>
+        <rect x="446" y="204" width="34" height="9" rx="2" fill="#e0c48b" transform="rotate(-18 446 204)"/>
+        <circle cx="452" cy="212" r="7" fill="#e6bd92"/>
+        <circle cx="398" cy="212" r="7" fill="#e6bd92"/>
+        <!-- 头 -->
+        <path d="M397 132 C397 118 405 110 415 110 C427 110 435 119 435 133 L435 146 C435 160 427 169 415 169 C403 169 397 159 397 146 Z" fill="#e6bd92"/>
+        <path d="M433 138 q9 3 1 9" fill="#e6bd92"/>
+        <path d="M424 134 q6 -4 10 0" fill="none" stroke="#3a332c" stroke-width="3" stroke-linecap="round"/>
+        <path d="M425 142 l7 0" stroke="#3a332c" stroke-width="2.6" stroke-linecap="round"/>
+        <!-- 长髯 -->
+        <path d="M410 158 C408 176 412 190 416 198 C420 190 424 176 422 158 Z" fill="#3a3630"/>
+        <path d="M400 154 C398 166 402 176 406 180" fill="none" stroke="#3a3630" stroke-width="4" stroke-linecap="round"/>
+        <path d="M432 154 C434 166 430 176 426 180" fill="none" stroke="#3a3630" stroke-width="4" stroke-linecap="round"/>
+        <!-- 冕冠 -->
+        <rect x="392" y="106" width="46" height="13" rx="3" fill="#20232a"/>
+        <rect x="386" y="100" width="58" height="9" rx="2" fill="#171a20"/>
+        <path d="M386 100 h58" stroke="#b8903f" stroke-width="2"/>
+        <g id="beads" stroke="#b8903f" stroke-width="1.6" fill="#d9b25c">
+          <path d="M392 109 v22"/><circle cx="392" cy="133" r="2.6" stroke="none"/>
+          <path d="M402 109 v25"/><circle cx="402" cy="136" r="2.6" stroke="none"/>
+          <path d="M414 109 v26"/><circle cx="414" cy="137" r="2.6" stroke="none"/>
+          <path d="M426 109 v25"/><circle cx="426" cy="136" r="2.6" stroke="none"/>
+          <path d="M436 109 v22"/><circle cx="436" cy="133" r="2.6" stroke="none"/>
+          <path d="M390 109 v20"/><circle cx="390" cy="131" r="2.4" stroke="none"/>
+          <path d="M438 109 v20"/><circle cx="438" cy="131" r="2.4" stroke="none"/>
+        </g>
+      </g>
+    </g>
+
+    <!-- 画框内细边 -->
+    <rect x="9" y="9" width="942" height="522" fill="none" stroke="#b8903f" stroke-width="1" opacity=".45"/>
+  </g>
+</svg>
+
+<div class="caption">
+  <div class="seal">秦</div>
+  <div><h1>秦始皇骑象图</h1><p>巡狩 · 动态 SVG</p></div>
+</div>
+
+<div class="tweaks" role="group" aria-label="动画控制">
+  <button id="play" type="button">暂停</button>
+  <span class="sep"></span>
+  <button type="button" data-sf="2">0.5×</button>
+  <button type="button" data-sf="1" class="on">1×</button>
+  <button type="button" data-sf="0.5">2×</button>
+</div>
+</div>
+
+<script>
+(function(){
+  var stage=document.getElementById('stage');
+  var play=document.getElementById('play');
+  play.addEventListener('click',function(){
+    stage.classList.toggle('paused');
+    play.textContent=stage.classList.contains('paused')?'继续':'暂停';
+  });
+  var speedBtns=document.querySelectorAll('[data-sf]');
+  speedBtns.forEach(function(b){
+    b.addEventListener('click',function(){
+      document.documentElement.style.setProperty('--sf',b.dataset.sf);
+      speedBtns.forEach(function(x){x.classList.remove('on')});
+      b.classList.add('on');
+    });
+  });
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    stage.classList.add('reduced');
+    play.textContent='继续';
+  }
+})();
+</script>
+</body>
+</html>
